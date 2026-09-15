@@ -48,7 +48,7 @@ async def score_resume_tool(resume_text: str, job_description: str) -> dict:
 
 
 async def llm_node(state: State) -> State:
-    """Use Claude via Gradient to analyze the resume match."""
+    """Use Gradient SDK to analyze the resume match with LLM tool use."""
 
     inference_client = AsyncGradient(
         model_access_key=os.environ.get("GRADIENT_MODEL_ACCESS_KEY")
