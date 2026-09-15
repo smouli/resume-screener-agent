@@ -25,7 +25,12 @@ An AI-powered resume screening agent built with DigitalOcean's serverless infras
 Your App → DO Inference Agent → DO Function → Score & Analysis
 ```
 
-See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed diagram and explanation.
+**How credentials work:**
+- Client sends `model_access_key` in request body
+- Agent uses it to call Gradient LLM API
+- Simple for demos, secure backends recommended for production
+
+See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed diagrams, credential handling strategies, and production recommendations.
 
 ## 📋 Features
 

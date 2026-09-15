@@ -370,23 +370,108 @@ Cost per 10,000 resumes: ~$2 (scales linearly)
 
 ---
 
-## Security Model
+## Security Model & Credential Handling
 
-### Authentication
-- **DO API Token:** Controls who can create agents/functions
-- **Model Access Key:** Controls who can call agents
-- **Function Isolation:** Functions run in isolated containers
+### Current Architecture: Client-Provided Credentials
 
-### Data Flow
-- Resume text → Agent → Function → Scoring output (no persistence)
+**How it works:**
+```bash
+curl -X POST https://agents.do-ai.run/.../run \
+  -H "Authorization: Bearer $DO_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resume_text": "...",
+    "job_description": "...",
+    "model_access_key": "doo_v1_your_gradient_key"  ← Client provides this
+  }'
+```
+
+**Advantages:**
+- ✅ Simple, no backend needed
+- ✅ Works for personal/internal use
+- ✅ No key storage requirement
+- ✅ Fast to develop/test
+
+**Limitations:**
+- ❌ Key exposed to client
+- ❌ Client must be trusted
+- ❌ No usage control/billing per user
+- ❌ Not suitable for public APIs
+
+### Production Architecture: Backend-Managed Credentials
+
+For a public/production system, use a secure backend proxy:
+
+```
+┌──────────────────┐
+│  Untrusted Client │
+│  (Web, Mobile)    │
+└────────┬─────────┘
+         │
+         │ POST /api/score-resume
+         │ {"resume_text": "...", "job_description": "..."}
+         │ (NO key required)
+         ↓
+┌──────────────────────────────────────┐
+│  YOUR Backend API (Node/Python/etc)  │
+│                                      │
+│  1. Authenticate client (JWT/OAuth)  │
+│  2. Check rate limits                │
+│  3. Load MODEL_ACCESS_KEY from vault │
+│  4. Call deployed agent              │
+│  5. Log usage for billing            │
+│  6. Return result to client          │
+└────────┬─────────────────────────────┘
+         │
+         │ POST https://agents.do-ai.run/.../run
+         │ {"resume_text": "...", "model_access_key": "..."}
+         │ (Key is internal only)
+         ↓
+┌──────────────────────────────────────┐
+│   DigitalOcean Gradient ADK Agent    │
+│   (Deployed Resume Screener)         │
+└──────────────────────────────────────┘
+```
+
+**Why this matters:**
+- ✅ Key never leaves your infrastructure
+- ✅ Per-user rate limiting & billing
+- ✅ Audit trail of who scored what
+- ✅ Can add business logic (price per resume, etc.)
+
+### Why We Chose Client-Provided (Current)
+
+For a portfolio/demo project:
+1. **Simpler:** No backend needed, shows agent works
+2. **Honest:** Documents the limitation (not hidden)
+3. **Functional:** Fully working end-to-end
+4. **Educational:** Shows trade-offs clearly
+
+### Gradient ADK Limitation Discovered
+
+During development, we discovered **Gradient ADK doesn't support secrets management**:
+- ❌ Can't pass env vars to deployed agents
+- ❌ No UI support for agent secrets
+- ❌ No documented secrets API
+- ❌ Deployed containers have network isolation that blocks external API calls
+
+**This means:** Gradient ADK isn't suitable for agents that call external APIs with credentials. It's designed for self-contained agents (with built-in tools like file access, bash, etc.)
+
+### Data Flow & Privacy
+- Resume text → Agent → Scoring function → Response (no persistence)
 - No data stored by default
 - No logs contain sensitive resume data
+- Key only used during request execution
 
 ### Best Practices
-- Use environment variables for keys (never hardcode)
-- Rotate API tokens regularly
-- Monitor DO console for unauthorized access
-- Consider adding rate limiting if public endpoint
+- **Local/Demo:** Pass key in request (current approach)
+- **Production:** Use backend proxy with secure vault
+- **Vault options:** 
+  - AWS Secrets Manager
+  - DO Managed Vault (if available)
+  - HashiCorp Vault
+  - Environment variables in Docker secrets
+- **Always:** Rotate keys regularly, monitor access logs
 
 ---
 
