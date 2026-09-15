@@ -43,40 +43,45 @@ See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed diagram and explanation
 - **Career coaching** — Help candidates improve their resumes
 - **Learning projects** — Understand agentic AI architecture
 
-## ⚡ Quick Start
+## ⚡ Quick Start (Local)
 
 ### Prerequisites
-- DigitalOcean account (free tier works)
-- `doctl` CLI installed
-- Python 3.9+
+- Python 3.10+
 - Git
+- DigitalOcean API credentials (optional, for deployed scoring function)
 
-### Setup (5 minutes)
+### Setup (2 minutes)
 
-1. **Clone the repo**
+1. **Clone and install**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/resume-screener-agent.git
+   git clone https://github.com/smouli/resume-screener-agent.git
    cd resume-screener-agent
+   pip install -r requirements.txt
    ```
 
-2. **Create `.env` file**
+2. **Set your credentials**
    ```bash
-   cp .env.example .env
-   # Add your DigitalOcean API Token and Model Access Key to .env
+   export MODEL_ACCESS_KEY="your_gradient_model_access_key"
    ```
 
-3. **Deploy to DigitalOcean**
+3. **Run the agent**
    ```bash
-   ./scripts/deploy_function.sh
-   ./scripts/create_agent.sh
+   gradient agent run
    ```
 
-4. **Test it**
+4. **Test it (in another terminal)**
    ```bash
-   # See docs/SETUP.md for detailed testing instructions
+   curl -X POST http://localhost:8080/run \
+     -H "Content-Type: application/json" \
+     -d '{
+       "resume_text": "Python engineer, 5 years AWS, FastAPI",
+       "job_description": "Senior Python - Required: Python, AWS",
+       "model_access_key": "your_gradient_model_access_key"
+     }'
    ```
 
-See [SETUP.md](docs/SETUP.md) for detailed setup instructions.
+### Full Setup
+See [SETUP.md](docs/SETUP.md) for deployment and advanced configuration.
 
 ## 📖 Documentation
 
@@ -119,25 +124,28 @@ curl -X POST https://api.digitalocean.com/v2/inference/agents/{agent_id}/invoke 
 
 ## ⚠️ Known Limitations
 
-### Gradient ADK Environment Variable Passing
-The agent runs perfectly locally but encounters a limitation when deployed via Gradient ADK: **environment variables set in the deployment shell are not captured and passed to the deployed container**.
+### Gradient ADK Deployment
+The agent works **perfectly locally** ✅ but has limitations when deployed via Gradient ADK's serverless platform.
 
-**The issue:**
-- `gradient agent deploy` builds a container but doesn't automatically inject env vars from your shell
-- The deployed container lacks `GRADIENT_MODEL_ACCESS_KEY` access
-- Gradient ADK's `agent.yml` configuration does not support env var interpolation or explicit env var declaration that works reliably
+**What works locally:**
+- ✅ Full agent functionality
+- ✅ LLM analysis generation
+- ✅ All external API calls
+- ✅ Pass credentials via request payload
 
-**Current workarounds:**
-1. **Run locally** (recommended for development) — Full functionality, instant feedback
-2. **Use the scoring function endpoint directly** — Already deployed and working via curl
-3. **Contact Gradient support** — They may have undocumented mechanisms or future fixes
+**What doesn't work on Gradient ADK:**
+- ❌ Deployed agent can't reach external APIs (network restriction)
+- ❌ Environment variables not passed to containers
+- ❌ ADK agents can't be configured with secrets via UI
+- ❌ No documented secrets management for deployed agents
 
-**Workarounds NOT tried due to platform constraints:**
-- Dockerfile-based env var injection (Gradient ADK controls the build)
-- CLI flags for env var passing (flag doesn't exist in doctl/gradient CLI)
-- Secrets management integration (not documented)
+**Why:** Gradient ADK appears designed for self-contained agents (with built-in tools) rather than agents calling external APIs. Its deployed environment has network restrictions that block outbound API calls.
 
-This is a platform limitation, not a code issue. The agent logic is sound and production-grade.
+**Solution:** The agent is fully functional when run **locally** using `gradient agent run`. For a production deployment that calls external LLM APIs, use platforms with unrestricted network access (AWS Lambda, Railway, Render, etc.).
+
+**What IS deployed and working:**
+- ✅ Scoring function on DO Functions (live endpoint)
+- ✅ Agent code on GitHub (ready to deploy elsewhere)
 
 ## 💡 Key Insights
 
