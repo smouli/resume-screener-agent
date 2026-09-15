@@ -1,9 +1,9 @@
 """
-Resume Screener Agent using Gradient ADK + LangGraph
+Resume Screener Agent using Gradient ADK
 
 Analyzes resumes against job descriptions using:
 - Quantitative scoring via deployed DO Function
-- Qualitative analysis via Claude (via Gradient SDK)
+- Qualitative analysis via Gradient LLM API
 - Tool use for intelligent reasoning
 """
 
@@ -14,8 +14,6 @@ from typing import Dict, TypedDict, Annotated
 
 from gradient import AsyncGradient
 from gradient_adk import entrypoint, RequestContext
-from langgraph.graph import StateGraph, add_messages
-from langgraph.prebuilt import ToolNode
 
 SCORING_ENDPOINT = "https://faas-nyc1-2ef2e6cc.doserverless.co/api/v1/web/fn-309f9b5b-dd19-493d-8450-b30f94517e21/default/resume-screener"
 
@@ -24,7 +22,7 @@ class State(TypedDict):
     """Agent state for resume screening."""
     resume_text: str
     job_description: str
-    messages: Annotated[list, add_messages]
+    messages: list
     score_result: dict
     final_analysis: str
     model_access_key: str
