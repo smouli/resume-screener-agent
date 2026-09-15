@@ -80,8 +80,7 @@ See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed diagrams, credential ha
      -H "Content-Type: application/json" \
      -d '{
        "resume_text": "Python engineer, 5 years AWS, FastAPI",
-       "job_description": "Senior Python - Required: Python, AWS",
-       "model_access_key": "your_gradient_model_access_key"
+       "job_description": "Senior Python - Required: Python, AWS"
      }'
    ```
 

@@ -372,33 +372,31 @@ Cost per 10,000 resumes: ~$2 (scales linearly)
 
 ## Security Model & Credential Handling
 
-### Current Architecture: Client-Provided Credentials
+### Current Architecture: Gradient Project Secrets (Implemented)
 
 **How it works:**
+1. Store secrets in Gradient project: `gradient secrets set project --name "model-access-key" --value "YOUR_KEY"`
+2. Reference in agent.yml: `value: secret:model-access-key`
+3. Agent reads from environment at runtime
+4. Client makes request without passing key:
+
 ```bash
 curl -X POST https://agents.do-ai.run/.../run \
   -H "Authorization: Bearer $DO_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "resume_text": "...",
-    "job_description": "...",
-    "model_access_key": "doo_v1_your_gradient_key"  ← Client provides this
+    "job_description": "..."
   }'
 ```
 
 **Advantages:**
-- ✅ Simple, no backend needed
-- ✅ Works for personal/internal use
-- ✅ No key storage requirement
-- ✅ Fast to develop/test
+- ✅ Key never exposed to client
+- ✅ Secure server-side storage
+- ✅ Clean, simple client interface
+- ✅ Production-grade security
 
-**Limitations:**
-- ❌ Key exposed to client
-- ❌ Client must be trusted
-- ❌ No usage control/billing per user
-- ❌ Not suitable for public APIs
-
-### Production Architecture: Backend-Managed Credentials
+### Production Architecture: Backend Proxy (For Public APIs)
 
 For a public/production system, use a secure backend proxy:
 
