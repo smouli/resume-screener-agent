@@ -2,7 +2,7 @@
 
 An AI-powered resume screening agent built with DigitalOcean's serverless infrastructure. Automatically scores resumes against job descriptions using intelligent analysis and detailed reasoning.
 
-## 🚀 Quick Overview
+## Quick Overview
 
 **What it does:**
 - Takes a resume and job description as input
@@ -19,7 +19,7 @@ An AI-powered resume screening agent built with DigitalOcean's serverless infras
 
 **Cost:** ~$1-3 per 100 resumes scored
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 Your App → DO Inference Agent → DO Function → Score & Analysis
@@ -32,23 +32,23 @@ Your App → DO Inference Agent → DO Function → Score & Analysis
 
 See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed diagrams, credential handling strategies, and production recommendations.
 
-## 📋 Features
+## Features
 
-- ✅ **Intelligent Scoring** — ML-powered resume analysis
-- ✅ **Detailed Reasoning** — Explains why a resume scored as it did
-- ✅ **Keyword Matching** — Identifies required vs missing skills
-- ✅ **Experience Analysis** — Evaluates relevant experience
-- ✅ **Serverless** — No infrastructure to manage
-- ✅ **Production-Ready** — Can handle real use cases
+- **Intelligent Scoring** — ML-powered resume analysis
+- **Detailed Reasoning** — Explains why a resume scored as it did
+- **Keyword Matching** — Identifies required vs missing skills
+- **Experience Analysis** — Evaluates relevant experience
+- **Serverless** — No infrastructure to manage
+- **Production-Ready** — Can handle real use cases
 
-## 🎯 Use Cases
+## Use Cases
 
 - **Recruiting teams** — Screen hundreds of resumes automatically
 - **Job portals** — Show applicants their match score
 - **Career coaching** — Help candidates improve their resumes
 - **Learning projects** — Understand agentic AI architecture
 
-## ⚡ Quick Start (Local)
+## Quick Start (Local)
 
 ### Prerequisites
 - Python 3.10+
@@ -88,14 +88,14 @@ See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed diagrams, credential ha
 ### Full Setup
 See [SETUP.md](docs/SETUP.md) for deployment and advanced configuration.
 
-## 📖 Documentation
+## Documentation
 
 - [**ARCHITECTURE.md**](docs/ARCHITECTURE.md) — How it works, credential handling, production strategies
 - [**GRADIENT_ADK_NOTES.md**](docs/GRADIENT_ADK_NOTES.md) — Platform investigation and findings
 - [**SETUP.md**](docs/SETUP.md) — Local setup and testing
 - [**DEPLOYMENT.md**](docs/DEPLOYMENT.md) — Deploy to DigitalOcean Gradient ADK
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Test the scoring function
@@ -107,7 +107,7 @@ curl -X POST https://api.digitalocean.com/v2/inference/agents/{agent_id}/invoke 
   -d '{"prompt": "Score this resume: ..."}'
 ```
 
-## 📊 Example Response
+## Example Response
 
 ```json
 {
@@ -127,32 +127,29 @@ curl -X POST https://api.digitalocean.com/v2/inference/agents/{agent_id}/invoke 
 }
 ```
 
-## ⚠️ Known Limitations
+## Issues I Faced
 
-### Gradient ADK Deployment
-The agent works **perfectly locally** ✅ but has limitations when deployed via Gradient ADK's serverless platform.
+### Gradient ADK Secrets Management
+The agent works perfectly locally but I hit a wall trying to deploy it on Gradient ADK's serverless platform.
 
-**What works locally:**
-- ✅ Full agent functionality
-- ✅ LLM analysis generation
-- ✅ All external API calls
-- ✅ Pass credentials via request payload
+**The Problem:**
+I wanted the deployed agent to call Gradient's LLM API, but Gradient ADK doesn't support passing secrets/environment variables to deployed agents. I tried everything:
+- Environment variables (doesn't capture them from shell)
+- Config files (no support in agent.yml)
+- UI secrets panel (designed for something else entirely)
+- Hardcoding (GitHub blocks it immediately)
 
-**What doesn't work on Gradient ADK:**
-- ❌ Deployed agent can't reach external APIs (network restriction)
-- ❌ Environment variables not passed to containers
-- ❌ ADK agents can't be configured with secrets via UI
-- ❌ No documented secrets management for deployed agents
+**Why It Happens:**
+Gradient ADK is designed for self-contained agents with built-in tools (file access, bash, etc.), not agents that call external APIs. The deployed environment has network restrictions that block outbound API calls anyway.
 
-**Why:** Gradient ADK appears designed for self-contained agents (with built-in tools) rather than agents calling external APIs. Its deployed environment has network restrictions that block outbound API calls.
+**My Solution:**
+Clients pass the `model_access_key` in the request payload. It's simple and works great for demos and internal use. For a public product, you'd want a backend proxy to keep credentials secure server-side.
 
-**Solution:** The agent is fully functional when run **locally** using `gradient agent run`. For a production deployment that calls external LLM APIs, use platforms with unrestricted network access (AWS Lambda, Railway, Render, etc.).
+**What's Actually Deployed:**
+- Scoring function on DO Functions (live and working)
+- Agent code on GitHub (ready to deploy elsewhere when needed)
 
-**What IS deployed and working:**
-- ✅ Scoring function on DO Functions (live endpoint)
-- ✅ Agent code on GitHub (ready to deploy elsewhere)
-
-## 💡 Key Insights
+## Key Insights
 
 This project teaches:
 
@@ -163,34 +160,13 @@ This project teaches:
 5. **Production Workflows** — From local testing to deployed agents
 6. **Deployment Challenges** — Understanding platform limitations and workarounds
 
-## 🛠️ Built With
+## Built With
 
-- **Framework:** OpenAI SDK (via DO Inference)
+- **Framework:** Gradient SDK (via DO Inference)
 - **Infrastructure:** DigitalOcean Serverless
 - **Language:** Python
-- **Deployment:** doctl CLI
+- **Deployment:** doctl CLI + Gradient Agent SDK
 
-## 📝 Blog Post
-
-See the accompanying article: "Building an AI Resume Screener with DigitalOcean Serverless Inference" (coming soon)
-
-## 🤝 Contributing
-
-Contributions welcome! Check [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE)
-
-## 🚀 Next Steps
-
-1. [Set up locally](docs/SETUP.md)
-2. [Deploy to DigitalOcean](docs/DEPLOYMENT.md)
-3. [Score your own resume](docs/SETUP.md#testing)
-4. Share your results!
-
----
-
-**Questions?** Open an issue or see the docs for more details.
-
-**Want to contribute?** Fork, improve, and submit a PR!
