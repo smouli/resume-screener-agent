@@ -23,34 +23,83 @@ The `gradient agent deploy` CLI does not have a mechanism to:
 2. Inject them into the deployed container at runtime
 3. Define them in the `agent.yml` configuration file in a way that works reliably
 
-### What We Tried
+### What We Tried (Comprehensive Testing Log)
 
-| Approach | Status | Notes |
-|----------|--------|-------|
-| `export VAR=value` before deploy | ❌ | CLI doesn't capture shell vars |
-| Setting in `agent.yml` with `${VAR}` | ❌ | Interpolation syntax not supported/doesn't work |
-| Hardcoding in code | ⚠️ | Works but fails GitHub secret scanning |
-| Fallback authentication methods | ❌ | Gradient ADK expects specific key format |
+| Approach | Status | Notes | Discovery |
+|----------|--------|-------|-----------|
+| `export VAR=value` before deploy | ❌ | CLI doesn't capture shell vars | Env vars from shell don't reach container |
+| Setting in `agent.yml` with `${VAR}` | ❌ | Interpolation syntax not supported | agent.yml doesn't support variable interpolation |
+| Hardcoding in code | ⚠️ | Works but fails GitHub secret scanning | Security issue; not a real solution |
+| Fallback authentication methods | ❌ | Gradient ADK expects specific key format | Tried DIGITALOCEAN_API_TOKEN as fallback; doesn't work |
+| UI "endpoint access keys" setting | ❌ | Only generates tokens for calling agent, not for agent's internal use | UI mechanism isn't designed for agent → API authentication |
+| Pass key in request payload | ✅ | **WORKS LOCALLY** | Agent can accept credentials via request JSON |
+| Deployed with request payload | ❌ | 403 Auth error, then network restriction | Network isolation prevents deployed agent from reaching external APIs |
+
+### Root Cause Analysis
+
+After systematic testing, we discovered **two separate issues**:
+
+1. **Environment variable passing** — Gradient ADK deploy doesn't support passing env vars to containers
+2. **Network isolation** — Deployed Gradient ADK containers have network restrictions that block external API calls
+
+This suggests **Gradient ADK is designed for self-contained agents** (with built-in tools like file access, bash) rather than agents that call external APIs.
 
 ### Current Status
 
-- **Local agent** — Fully functional ✅
+- **Local agent** — Fully functional ✅ (with key in request)
 - **DO Function endpoint** — Fully functional ✅
-- **Gradient ADK deployment** — Non-functional ❌
+- **Gradient ADK deployment** — Non-functional ❌ (network isolation)
 
-### Recommended Approach
+### Solution: Pass Credentials in Request Payload
 
-For production use, **run the agent locally** or **call the DO Function endpoint directly**:
+**What works:** The agent accepts `model_access_key` in the request JSON:
 
 ```bash
-# Local (recommended for testing/demos)
-export GRADIENT_MODEL_ACCESS_KEY=$YOUR_KEY
-python -c "from main import main; import asyncio; asyncio.run(main(...))"
-
-# OR call the deployed scoring function directly
-curl -X POST https://faas-nyc1-2ef2e6cc.doserverless.co/api/v1/web/fn-309f9b5b-dd19-493d-8450-b30f94517e21/default/resume-screener \
-  -d '{"resume_text": "...", "job_description": "..."}'
+gradient agent run
 ```
+
+Then call it with:
+```bash
+curl -X POST http://localhost:8080/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resume_text": "Python engineer, 5 years AWS",
+    "job_description": "Senior Python - Required: Python, AWS",
+    "model_access_key": "doo_v1_your_key_here"
+  }'
+```
+
+**Why this matters:**
+- Eliminates dependency on environment variables
+- Allows dynamic credential passing at runtime
+- Works locally ✅
+- More secure than hardcoding
+- Not restricted by Gradient ADK's deployment limitations
+
+**Why it doesn't solve Gradient ADK deployment:**
+- The deployed agent still can't reach external APIs (network isolation)
+- But the approach is architecturally sound for any platform with unrestricted network access
+
+### Recommended Approach for Production
+
+For production deployment of an agent that calls external APIs:
+
+1. **Use platforms with unrestricted network access:**
+   - AWS Lambda / API Gateway
+   - Railway.app
+   - Render
+   - Fly.io
+   - Traditional VPS (EC2, Linode, etc.)
+
+2. **Use DigitalOcean App Platform (not Gradient ADK):**
+   - Standard container deployment
+   - Full env var support
+   - Unrestricted outbound network
+
+3. **For local development/demos:**
+   - Run `gradient agent run` 
+   - Pass credentials in request payload
+   - Works perfectly ✅
 
 ### For Future Reference
 
