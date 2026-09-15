@@ -1,0 +1,4 @@
+runtime: python
+functions:
+  resume_scorer:
+    filepath: functions/resume_scorer.py

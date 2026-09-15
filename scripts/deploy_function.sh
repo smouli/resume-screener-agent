@@ -17,7 +17,7 @@ fi
 source .env
 
 # Check if FUNCTION_NAMESPACE is set
-NAMESPACE=${FUNCTION_NAMESPACE:-default}
+NAMESPACE=${FUNCTION_NAMESPACE:-fn-309f9b5b-dd19-493d-8450-b30f94517e21}
 REGION=${FUNCTION_REGION:-nyc}
 
 echo "📦 Configuration:"
@@ -25,11 +25,10 @@ echo "   Namespace: $NAMESPACE"
 echo "   Region: $REGION"
 echo "   Function: resume_scorer"
 
-# Deploy the function
+# Deploy the function from root
 echo "⏳ Deploying..."
-doctl serverless deploy functions/resume_scorer.py \
-    --namespace "$NAMESPACE" \
-    --region "$REGION"
+cd ..
+doctl serverless deploy .
 
 echo ""
 echo "✅ Deployment successful!"
