@@ -50,8 +50,12 @@ async def score_resume_tool(resume_text: str, job_description: str) -> dict:
 async def llm_node(state: State) -> State:
     """Use Gradient SDK to analyze the resume match with LLM tool use."""
 
+    key = os.environ.get("GRADIENT_MODEL_ACCESS_KEY") or os.environ.get("DIGITALOCEAN_API_TOKEN")
+    if not key:
+        return {"error": "GRADIENT_MODEL_ACCESS_KEY or DIGITALOCEAN_API_TOKEN not set", "status": "failed"}
+
     inference_client = AsyncGradient(
-        model_access_key=os.environ.get("GRADIENT_MODEL_ACCESS_KEY")
+        model_access_key=key
     )
 
     # Define tool for scoring
