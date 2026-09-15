@@ -1,0 +1,50 @@
+test_cases:
+  - name: "perfect_match"
+    description: "Senior engineer with all required and preferred skills"
+    input:
+      resume_text: "Senior Python Engineer, 8 years. Skills: Python, FastAPI, Django, AWS (EC2, RDS, S3, Lambda), PostgreSQL, Redis, Docker, Kubernetes, REST APIs, Microservices. Led teams of 5+ engineers. Built microservices handling 10M+ users."
+      job_description: "Senior Python Engineer - Required: 5+ years Python, REST API design, AWS or cloud, SQL database, Microservices. Preferred: Docker, Kubernetes, FastAPI, Leadership."
+    expected_score_range: [85, 100]
+    expected_recommendation: "EXCELLENT"
+
+  - name: "moderate_match"
+    description: "Mid-level engineer missing cloud experience"
+    input:
+      resume_text: "Python Developer, 4 years. Skills: Python, Django, PostgreSQL, Docker. Built REST APIs with Django."
+      job_description: "Senior Python Engineer - Required: 5+ years Python, REST API design, AWS, SQL database, Microservices."
+    expected_score_range: [40, 60]
+    expected_recommendation: "WEAK"
+
+  - name: "junior_developer"
+    description: "Junior with minimal experience"
+    input:
+      resume_text: "Python Developer, 1 year. Skills: Python, basic Django, SQLite. Built simple web apps."
+      job_description: "Senior Python Engineer - Required: 5+ years Python, REST API design, AWS, SQL database, Microservices."
+    expected_score_range: [30, 50]
+    expected_recommendation: "WEAK"
+
+  - name: "aws_expert_strong_match"
+    description: "AWS expert with all required skills"
+    input:
+      resume_text: "Senior Backend Engineer, 6 years. Python expert. AWS specialist: EC2, Lambda, RDS, S3. REST API expert. PostgreSQL and Redis. Docker and Kubernetes. Built microservices."
+      job_description: "Senior Python Engineer - Required: 5+ years Python, REST API design, AWS, SQL database, Microservices."
+    expected_score_range: [65, 85]
+    expected_recommendation: "STRONG"
+
+  - name: "database_specialist_gap"
+    description: "Specialist missing microservices and cloud"
+    input:
+      resume_text: "Backend Specialist, 6 years. Python, PostgreSQL expert, MySQL, MongoDB, REST APIs, Docker."
+      job_description: "Senior Python Engineer - Required: 5+ years Python, REST API design, AWS, SQL database, Microservices."
+    expected_score_range: [40, 60]
+    expected_recommendation: "WEAK"
+
+evaluation_metrics:
+  - name: "score_accuracy"
+    description: "Score falls within expected range"
+
+  - name: "strength_identification"
+    description: "Correctly identifies key skills"
+
+  - name: "gap_analysis"
+    description: "Accurately identifies missing skills"

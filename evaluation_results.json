@@ -1,0 +1,128 @@
+[
+  {
+    "name": "perfect_match",
+    "status": "PASSED",
+    "score": 100,
+    "score_in_range": true,
+    "recommendation": "\u2b50 EXCELLENT MATCH - Strong hire recommendation",
+    "recommendation_match": true,
+    "result": {
+      "gaps": [],
+      "keywords_matched": 10,
+      "keywords_total": 10,
+      "match_percentage": "100%",
+      "reasoning": "Matched 6/6 required skills. Matched 4/4 preferred skills. Key matches: python, rest api, r, microservices, aws.",
+      "recommendation": "\u2b50 EXCELLENT MATCH - Strong hire recommendation",
+      "score": 100,
+      "strengths": [
+        "python",
+        "rest api",
+        "r",
+        "microservices",
+        "aws"
+      ]
+    }
+  },
+  {
+    "name": "moderate_match",
+    "status": "PASSED",
+    "score": 46,
+    "score_in_range": true,
+    "recommendation": "\u26a0\ufe0f WEAK MATCH - May not be ideal fit",
+    "recommendation_match": true,
+    "result": {
+      "gaps": [
+        "microservices",
+        "aws"
+      ],
+      "keywords_matched": 4,
+      "keywords_total": 6,
+      "match_percentage": "46%",
+      "reasoning": "Matched 4/6 required skills. Matched 0/0 preferred skills. Key matches: python, rest api, r, sql.",
+      "recommendation": "\u26a0\ufe0f WEAK MATCH - May not be ideal fit",
+      "score": 46,
+      "strengths": [
+        "python",
+        "rest api",
+        "r",
+        "sql"
+      ]
+    }
+  },
+  {
+    "name": "junior_developer",
+    "status": "PASSED",
+    "score": 35,
+    "score_in_range": true,
+    "recommendation": "\u26a0\ufe0f WEAK MATCH - May not be ideal fit",
+    "recommendation_match": true,
+    "result": {
+      "gaps": [
+        "rest api",
+        "microservices",
+        "aws"
+      ],
+      "keywords_matched": 3,
+      "keywords_total": 6,
+      "match_percentage": "35%",
+      "reasoning": "Matched 3/6 required skills. Matched 0/0 preferred skills. Key matches: python, r, sql.",
+      "recommendation": "\u26a0\ufe0f WEAK MATCH - May not be ideal fit",
+      "score": 35,
+      "strengths": [
+        "python",
+        "r",
+        "sql"
+      ]
+    }
+  },
+  {
+    "name": "aws_expert_strong_match",
+    "status": "PASSED",
+    "score": 70,
+    "score_in_range": true,
+    "recommendation": "\u2705 STRONG MATCH - Recommend for phone screen",
+    "recommendation_match": true,
+    "result": {
+      "gaps": [],
+      "keywords_matched": 6,
+      "keywords_total": 6,
+      "match_percentage": "70%",
+      "reasoning": "Matched 6/6 required skills. Matched 0/0 preferred skills. Key matches: python, rest api, r, microservices, aws.",
+      "recommendation": "\u2705 STRONG MATCH - Recommend for phone screen",
+      "score": 70,
+      "strengths": [
+        "python",
+        "rest api",
+        "r",
+        "microservices",
+        "aws"
+      ]
+    }
+  },
+  {
+    "name": "database_specialist_gap",
+    "status": "PASSED",
+    "score": 46,
+    "score_in_range": true,
+    "recommendation": "\u26a0\ufe0f WEAK MATCH - May not be ideal fit",
+    "recommendation_match": true,
+    "result": {
+      "gaps": [
+        "microservices",
+        "aws"
+      ],
+      "keywords_matched": 4,
+      "keywords_total": 6,
+      "match_percentage": "46%",
+      "reasoning": "Matched 4/6 required skills. Matched 0/0 preferred skills. Key matches: python, rest api, r, sql.",
+      "recommendation": "\u26a0\ufe0f WEAK MATCH - May not be ideal fit",
+      "score": 46,
+      "strengths": [
+        "python",
+        "rest api",
+        "r",
+        "sql"
+      ]
+    }
+  }
+]
