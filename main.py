@@ -168,7 +168,8 @@ async def main(input: Dict, context: RequestContext):
 
     resume_text = input.get("resume_text", "")
     job_description = input.get("job_description", "")
-    model_access_key = input.get("model_access_key", "")
+    # Get from environment (set via project secret)
+    model_access_key = os.environ.get("GRADIENT_MODEL_ACCESS_KEY", "")
 
     if not resume_text or not job_description:
         return {
