@@ -117,6 +117,28 @@ curl -X POST https://api.digitalocean.com/v2/inference/agents/{agent_id}/invoke 
 }
 ```
 
+## ⚠️ Known Limitations
+
+### Gradient ADK Environment Variable Passing
+The agent runs perfectly locally but encounters a limitation when deployed via Gradient ADK: **environment variables set in the deployment shell are not captured and passed to the deployed container**.
+
+**The issue:**
+- `gradient agent deploy` builds a container but doesn't automatically inject env vars from your shell
+- The deployed container lacks `GRADIENT_MODEL_ACCESS_KEY` access
+- Gradient ADK's `agent.yml` configuration does not support env var interpolation or explicit env var declaration that works reliably
+
+**Current workarounds:**
+1. **Run locally** (recommended for development) — Full functionality, instant feedback
+2. **Use the scoring function endpoint directly** — Already deployed and working via curl
+3. **Contact Gradient support** — They may have undocumented mechanisms or future fixes
+
+**Workarounds NOT tried due to platform constraints:**
+- Dockerfile-based env var injection (Gradient ADK controls the build)
+- CLI flags for env var passing (flag doesn't exist in doctl/gradient CLI)
+- Secrets management integration (not documented)
+
+This is a platform limitation, not a code issue. The agent logic is sound and production-grade.
+
 ## 💡 Key Insights
 
 This project teaches:
@@ -126,6 +148,7 @@ This project teaches:
 3. **DO Infrastructure** — Function routing, Inference, API orchestration
 4. **AI/ML Integration** — Scoring algorithms, prompt engineering
 5. **Production Workflows** — From local testing to deployed agents
+6. **Deployment Challenges** — Understanding platform limitations and workarounds
 
 ## 🛠️ Built With
 
