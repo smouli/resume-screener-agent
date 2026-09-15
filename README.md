@@ -90,10 +90,10 @@ See [SETUP.md](docs/SETUP.md) for deployment and advanced configuration.
 
 ## 📖 Documentation
 
-- [**ARCHITECTURE.md**](docs/ARCHITECTURE.md) — How it works, diagrams, component breakdown
-- [**SETUP.md**](docs/SETUP.md) — Step-by-step setup and testing
-- [**DEPLOYMENT.md**](docs/DEPLOYMENT.md) — Deploy to DigitalOcean
-- [**API.md**](docs/API.md) — Agent endpoint documentation
+- [**ARCHITECTURE.md**](docs/ARCHITECTURE.md) — How it works, credential handling, production strategies
+- [**GRADIENT_ADK_NOTES.md**](docs/GRADIENT_ADK_NOTES.md) — Platform investigation and findings
+- [**SETUP.md**](docs/SETUP.md) — Local setup and testing
+- [**DEPLOYMENT.md**](docs/DEPLOYMENT.md) — Deploy to DigitalOcean Gradient ADK
 
 ## 🧪 Testing
 
