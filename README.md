@@ -129,25 +129,25 @@ curl -X POST https://api.digitalocean.com/v2/inference/agents/{agent_id}/invoke 
 
 ## Issues I Faced
 
-### Gradient ADK Secrets Management
-The agent works perfectly locally but I hit a wall trying to deploy it on Gradient ADK's serverless platform.
+### Gradient ADK Secrets Management (Solved)
+
+I initially struggled with passing the MODEL_ACCESS_KEY to the deployed agent, but discovered Gradient ADK's proper secrets management approach.
 
 **The Problem:**
-I wanted the deployed agent to call Gradient's LLM API, but Gradient ADK doesn't support passing secrets/environment variables to deployed agents. I tried everything:
-- Environment variables (doesn't capture them from shell)
-- Config files (no support in agent.yml)
-- UI secrets panel (designed for something else entirely)
-- Hardcoding (GitHub blocks it immediately)
+My first attempts to pass credentials failed because I was trying to use environment variables or config files — approaches that Gradient ADK doesn't support for deployed agents.
 
-**Why It Happens:**
-Gradient ADK is designed for self-contained agents with built-in tools (file access, bash, etc.), not agents that call external APIs. The deployed environment has network restrictions that block outbound API calls anyway.
+**The Solution:**
+Gradient ADK provides a proper secrets management system:
+1. Store secrets in the project: `gradient secrets set project --name "model-access-key" --value "YOUR_KEY"`
+2. Reference in agent.yml: `value: secret:model-access-key`
+3. Agent reads from environment at runtime
 
-**My Solution:**
-Clients pass the `model_access_key` in the request payload. It's simple and works great for demos and internal use. For a public product, you'd want a backend proxy to keep credentials secure server-side.
+This is the secure, documented way to handle credentials in Gradient ADK deployments.
 
-**What's Actually Deployed:**
-- Scoring function on DO Functions (live and working)
-- Agent code on GitHub (ready to deploy elsewhere when needed)
+**What's Deployed:**
+- ✅ Agent on Gradient ADK (deployed and working)
+- ✅ Scoring function on DO Functions (deployed and working)
+- ✅ Proper secrets management in place
 
 ## Key Insights
 
