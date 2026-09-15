@@ -39,7 +39,7 @@ async def score_resume_tool(resume_text: str, job_description: str) -> dict:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(SCORING_ENDPOINT, json=payload, timeout=10)
-            result = response.json().get("body", {})
+            result = response.json()
             if result.get("error"):
                 return {"error": result["error"]}
             return result
