@@ -27,6 +27,7 @@ class State(TypedDict):
     messages: Annotated[list, add_messages]
     score_result: dict
     final_analysis: str
+    model_access_key: str
 
 
 async def score_resume_tool(resume_text: str, job_description: str) -> dict:
@@ -50,9 +51,12 @@ async def score_resume_tool(resume_text: str, job_description: str) -> dict:
 async def llm_node(state: State) -> State:
     """Use Gradient SDK to analyze the resume match with LLM tool use."""
 
-    key = os.environ.get("GRADIENT_MODEL_ACCESS_KEY") or os.environ.get("DIGITALOCEAN_API_TOKEN")
+    key = state.get("model_access_key")
     if not key:
-        return {"error": "GRADIENT_MODEL_ACCESS_KEY or DIGITALOCEAN_API_TOKEN not set", "status": "failed"}
+        key = os.environ.get("GRADIENT_MODEL_ACCESS_KEY") or os.environ.get("DIGITALOCEAN_API_TOKEN")
+    if not key:
+        state["final_analysis"] = "Error: model_access_key not provided in request or env vars"
+        return state
 
     inference_client = AsyncGradient(
         model_access_key=key
@@ -164,6 +168,7 @@ async def main(input: Dict, context: RequestContext):
 
     resume_text = input.get("resume_text", "")
     job_description = input.get("job_description", "")
+    model_access_key = input.get("model_access_key", "")
 
     if not resume_text or not job_description:
         return {
@@ -177,7 +182,8 @@ async def main(input: Dict, context: RequestContext):
         job_description=job_description,
         messages=[],
         score_result={},
-        final_analysis=""
+        final_analysis="",
+        model_access_key=model_access_key
     )
 
     # Run the agent

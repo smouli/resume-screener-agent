@@ -1,0 +1,14 @@
+name: resume-screener-agent
+services:
+- name: agent
+  github:
+    repo: smouli/resume-screener-agent
+    branch: main
+  build_command: pip install anthropic httpx langgraph gradient-ai gradient-adk
+  http_port: 8000
+  run_command: python -m uvicorn main:app --host 0.0.0.0 --port 8000
+  envs:
+  - key: GRADIENT_MODEL_ACCESS_KEY
+    scope: RUN_AND_BUILD_TIME
+  - key: DIGITALOCEAN_API_TOKEN
+    scope: RUN_AND_BUILD_TIME
